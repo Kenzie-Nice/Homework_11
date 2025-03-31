@@ -14,6 +14,99 @@
     
     <canvas id="gameCanvas"></canvas>
 
-    <script src="5.js"></script>
+    <script>
+        console.log("JavaScript is running!");
+
+        // Get canvas element and set up its context
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas size
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Player object for interaction
+        const player = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 50,
+            height: 50,
+            color: "blue",
+            speed: 5
+        };
+
+        // Audio playback
+        const audio = document.getElementById('bg-music');
+        audio.play().catch((error) => {
+            console.error('Audio failed to play:', error);
+        });
+
+        // Event listener for controlling the player
+        window.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                    if (player.y > 0) player.y -= player.speed;
+                    break;
+                case 'ArrowDown':
+                    if (player.y < canvas.height - player.height) player.y += player.speed;
+                    break;
+                case 'ArrowLeft':
+                    if (player.x > 0) player.x -= player.speed;
+                    break;
+                case 'ArrowRight':
+                    if (player.x < canvas.width - player.width) player.x += player.speed;
+                    break;
+            }
+        });
+
+        // Autonomous moving object
+        const autonomousObject = {
+            x: 400,
+            y: 300,
+            width: 50,
+            height: 50,
+            color: "red",
+            speed: 2
+        };
+
+        // Draw all objects
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+            // Draw player
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Draw autonomous object
+            ctx.fillStyle = autonomousObject.color;
+            ctx.fillRect(autonomousObject.x, autonomousObject.y, autonomousObject.width, autonomousObject.height);
+
+            // Autonomous movement logic (moving in a random direction)
+            autonomousObject.x += autonomousObject.speed;
+            if (autonomousObject.x >= canvas.width - autonomousObject.width || autonomousObject.x <= 0) {
+                autonomousObject.speed *= -1; // Reverse direction
+            }
+
+            // Check for collision
+            if (isColliding(player, autonomousObject)) {
+                canvas.style.backgroundColor = 'lightblue'; // Change background color on collision
+                player.width += 5;  // Increase player size on collision
+                player.height += 5;
+            }
+
+            requestAnimationFrame(draw); // Keep drawing the frame
+        }
+
+        // Collision detection function
+        function isColliding(obj1, obj2) {
+            return !(obj1.x + obj1.width < obj2.x || 
+                     obj1.x > obj2.x + obj2.width || 
+                     obj1.y + obj1.height < obj2.y || 
+                     obj1.y > obj2.y + obj2.height);
+        }
+
+        // Start drawing
+        draw();
+    </script>
 </body>
 </html>
